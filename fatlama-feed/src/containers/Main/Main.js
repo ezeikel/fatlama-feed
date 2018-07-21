@@ -1,15 +1,14 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import Home from '../../containers/Home/Home';
 import Feed from '../../components/Feed/Feed';
-import Transactions from '../../components/Transactions/Transactions';
+import Transaction from '../../components/Transaction/Transaction';
 
 const Main = () => (
   <main>
     <Switch>
-      <Route exact path='/' component={Home} />
-      <Route exact path='/feed' component={Feed} />
-      <Route exact path="/transactions" component={Transactions} />
+      <Route exact path='/' component={Feed} />
+      <Route path='/feed' component={Feed} />
+      <Route path="/transaction/:id" component={Transaction} />
     </Switch>
   </main>
 );

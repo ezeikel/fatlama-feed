@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 class Feed extends Component {
@@ -15,12 +16,12 @@ class Feed extends Component {
   fetchData = async () => {
     let morePages = true;
     let index = 0;
-    const url = 'http://localhost:8080/transactions';
+    const url = 'http://localhost:8080';
 
     while(morePages) {
       let response;
       try {
-        response = await axios.get(`${url}/${index}`);
+        response = await axios.get(`${url}/transactions/${index}`);
       } catch(error) {
         morePages = false;
         this.setState({
@@ -62,6 +63,7 @@ class Feed extends Component {
         <li key={transaction.id}>
           <span>id: {transaction.id}</span>
           <span>status: {transaction.status}</span>
+          <Link to={`/transaction/${transaction.id}`}>View</Link>
         </li>
       ))
     } else {
