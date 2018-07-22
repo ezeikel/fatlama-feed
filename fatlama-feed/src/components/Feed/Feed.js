@@ -7,7 +7,7 @@ class Feed extends Component {
     page: 1,
     totalPages: 0,
     transactions: {},
-    orderBy: 'recent'
+    orderBy: ''
   };
 
   componentDidMount() {
@@ -65,9 +65,13 @@ class Feed extends Component {
         return 0;
       }
 
+      const sortByDate = (a,b) => {
+        return new Date(b.fromDate) - new Date(a.fromDate);
+      }
+
       const transactions = [...prevState.transactions[prevState.page]];
       
-      transactions.sort(sortByStatus);
+      transactions.sort(value === 'status' ? sortByStatus : sortByDate);
 
       return {
         orderBy: value,
@@ -77,11 +81,6 @@ class Feed extends Component {
         }
       }
     });
-  }
-
-  handleOrderBy = () => {
-    let transactions = {...this.state.transactions};
-    console.log({ transactions });
   }
 
   handleNextClick = () => {
@@ -101,12 +100,12 @@ class Feed extends Component {
   }
 
   renderTransactions = () => {
-    debugger;
     if (this.state.transactions[this.state.page]) {
       return this.state.transactions[this.state.page].map(transaction => (
         <li key={transaction.id}>
           <span>id: {transaction.id}</span>
           <span>status: {transaction.status}</span>
+          <span>fromDate: {new Date(transaction.fromDate).toLocaleDateString()}</span>
           <Link to={`/transaction/${transaction.id}`}>View</Link>
         </li>
       ))
@@ -121,6 +120,7 @@ class Feed extends Component {
         <h1>Page: {this.state.page}</h1>
         <h4>Total Pages: {this.state.totalPages}</h4>
         <select value={this.state.orderBy} onChange={this.handleChange}>
+          <option value="">Select a vaule to sort by</option>
           {this.createSelectItems()}
         </select>
         <ul>
