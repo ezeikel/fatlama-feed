@@ -42,6 +42,7 @@ class Transaction extends Component {
         <option key={code} value={code}>{code}</option>
       )
     });
+
     return items;
   }
 

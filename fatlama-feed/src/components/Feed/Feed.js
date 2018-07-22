@@ -6,7 +6,8 @@ class Feed extends Component {
   state = {
     page: 1,
     totalPages: 0,
-    transactions: {}
+    transactions: {},
+    orderBy: 'recent'
   };
 
   componentDidMount() {
@@ -41,6 +42,51 @@ class Feed extends Component {
     }
   }
 
+  createSelectItems = () => {
+    const orderValues = ['recent', 'status'];
+    let items = [];
+
+    orderValues.forEach(value => {
+      items.push(
+        <option key={value} value={value}>{value}</option>
+      )
+    });
+
+    return items;
+  }
+
+  handleChange = (e) => {
+    const { value } = e.target;
+
+    this.setState(prevState => {
+      const sortByStatus = (a,b) => {
+        debugger;
+        if (a.status < b.status) return -1;
+        if (a.status > b.staus) return 1;
+        return 0;
+      }
+
+      const transactions = [...prevState.transactions[prevState.page]];
+      
+      transactions.sort(sortByStatus);
+
+      console.log([transactions]);
+
+      return {
+        orderBy: value,
+        transactions: {
+          ...prevState.transactions,
+          [prevState.page]: transactions
+        }
+      }
+    });
+  }
+
+  handleOrderBy = () => {
+    let transactions = {...this.state.transactions};
+    console.log({ transactions });
+  }
+
   handleNextClick = () => {
     this.setState(prevState => {
       return {
@@ -58,6 +104,7 @@ class Feed extends Component {
   }
 
   renderTransactions = () => {
+    debugger;
     if (this.state.transactions[this.state.page]) {
       return this.state.transactions[this.state.page].map(transaction => (
         <li key={transaction.id}>
@@ -76,6 +123,9 @@ class Feed extends Component {
       <React.Fragment>
         <h1>Page: {this.state.page}</h1>
         <h4>Total Pages: {this.state.totalPages}</h4>
+        <select value={this.state.orderBy} onChange={this.handleChange}>
+          {this.createSelectItems()}
+        </select>
         <ul>
           {this.renderTransactions()}
         </ul>
