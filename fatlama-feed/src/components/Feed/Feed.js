@@ -60,17 +60,14 @@ class Feed extends Component {
 
     this.setState(prevState => {
       const sortByStatus = (a,b) => {
-        debugger;
         if (a.status < b.status) return -1;
-        if (a.status > b.staus) return 1;
+        if (a.status > b.status) return 1;
         return 0;
       }
 
       const transactions = [...prevState.transactions[prevState.page]];
       
       transactions.sort(sortByStatus);
-
-      console.log([transactions]);
 
       return {
         orderBy: value,
