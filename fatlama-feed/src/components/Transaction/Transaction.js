@@ -10,6 +10,8 @@ const STATUS_CODES = [
   'QUARANTINED'
 ];
 
+const URL = 'http://localhost:8080';
+
 class Transaction extends Component {
   state = {
     transaction: {},
@@ -17,10 +19,13 @@ class Transaction extends Component {
   }
 
   componentDidMount() {
-    const url = 'http://localhost:8080';
     const { match: { params } } = this.props;
 
-    axios.get(`${url}/transaction/${params.id}`)
+    this.fetchData(params.id);
+  }
+
+  fetchData(id) {
+    axios.get(`${URL}/transaction/${id}`)
       .then(response => {
         this.setState({
           transaction: response.data
@@ -30,20 +35,43 @@ class Transaction extends Component {
 
   createSelectItems = () => {
     let items = [];
-    const status = this.state.transaction.status;
+    const { status } = this.state.transaction;
 
-    STATUS_CODES.forEach(code => {
-      const selected = status === code;
+    STATUS_CODES.filter(code => code !== status).forEach(code => {
       items.push(
-        <option selected={selected} key={code} value={code}>{code}</option>
+        <option key={code} value={code}>{code}</option>
       )
     });
     return items;
   }
 
+  handleChange = (e) => {
+    this.setState({
+      updatedStatus: e.target.value
+    });
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted');
+
+    axios.put(`${URL}/transaction/${this.state.transaction.id}`, {
+      status: this.state.updatedStatus
+    })
+    .then(response => {
+      console.log(`Updated Transactions successfully ✅`);
+      const { status, data } = response;
+
+      if (status === 200) {
+        this.setState({
+          transaction: data,
+          updatedStatus: ''
+        });
+      }
+
+    })
+    .catch(error => {
+      console.log(`Failed to update transaction with error: ${error}.`);
+    });
   }
 
   render() {
@@ -53,7 +81,7 @@ class Transaction extends Component {
         <h3>{this.state.transaction.status}</h3>
         <h2>Change Status</h2>
         <form onSubmit={this.handleSubmit}>
-          <select>
+          <select value={this.state.updatedStatus} onChange={this.handleChange}>
             <option value="">Select a transaction status</option>
             {this.createSelectItems()}
           </select>
