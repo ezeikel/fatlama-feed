@@ -15,6 +15,8 @@ const URL = 'http://localhost:8080';
 class Transaction extends Component {
   state = {
     transaction: {},
+    lender: {},
+    borrower: {},
     updatedStatus: ''
   }
 
@@ -24,13 +26,16 @@ class Transaction extends Component {
     this.fetchData(params.id);
   }
 
-  fetchData(id) {
-    axios.get(`${URL}/transaction/${id}`)
-      .then(response => {
-        this.setState({
-          transaction: response.data
-        });
-      });
+  fetchData = async (id) => {
+    const transaction = await axios.get(`${URL}/transaction/${id}`);
+    const lender = await axios.get(`${URL}/user/${transaction.data.lenderId}`);
+    const borrower = await axios.get(`${URL}/user/${transaction.data.borrowerId}`);
+
+    this.setState({
+      transaction: transaction.data,
+      lender: lender.data,
+      borrower: borrower.data
+    });
   }
 
   createSelectItems = () => {
@@ -75,11 +80,38 @@ class Transaction extends Component {
     });
   }
 
+  renderUser = (user) => {
+    if (user) {
+      return (
+        <React.Fragment>
+          <img src={user.profileImgUrl} alt="profile" />
+          <span><strong>Firstname:</strong> {user.firstName}</span>
+          <span><strong>LastName:</strong> {user.lastName}</span>
+          <span><strong>Telephone:</strong> {user.telephone}</span>
+          <span><strong>Credit:</strong> {user.credit}</span>
+          <span><strong>Email:</strong> {user.email}</span>
+        </React.Fragment>
+      );
+    }
+  }
+
   render() {
+    const { transaction, borrower, lender } =  this.state;
     return (
       <React.Fragment>
-        <h1>{this.state.transaction.id}</h1>
-        <h3>{this.state.transaction.status}</h3>
+        <h1><strong>ID:</strong> {transaction.id}</h1>
+        <h3><strong>Status:</strong> {transaction.status}</h3>
+        <span><strong>From:</strong> {new Date(transaction.fromDate).toLocaleDateString()}</span>
+        <span><strong>To:</strong> {new Date(transaction.toDate).toLocaleDateString()}</span>
+        <span><strong>Promo Code:</strong> {transaction.promocode === null ? 'No promo code used.' : transaction.promocode}</span>
+        <span><strong>Credit Used:</strong> {Number(transaction.creditUsed / 100).toFixed(2)} <span>({transaction.currency})</span></span>
+        <span><strong>Total Discount:</strong> {Number(transaction.totalDiscount / 100).toFixed(2)} <span>({transaction.currency})</span></span>
+        <span><strong>Price:</strong> {Number(transaction.price / 100).toFixed(2)} <span>({transaction.currency})</span></span>
+        <h2>Lender</h2>
+        {this.renderUser(lender)}
+        <span>{transaction.lenderId}</span>
+        <h2>Borrower</h2>
+        {this.renderUser(borrower)}
         <h2>Change Status</h2>
         <form onSubmit={this.handleSubmit}>
           <select value={this.state.updatedStatus} onChange={this.handleChange}>
