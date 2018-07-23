@@ -1,6 +1,79 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import styled from 'styled-components';
+
+import FeedItem from '../../containers/FeedItem/FeedItem';
+
+const FeedControls = styled.section`
+  width: 25%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr 1fr;
+  place-items: center;
+  grid-column-gap: var(--spacing-medium);
+`;
+
+const PreviousButton = styled.button`
+  font-size: 22px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  opacity: ${props => props.disabled ? '0.5' : 'initial'};
+  transition: opacity 0.3s ease-in-out;
+  cursor: pointer;
+  grid-column: 1 / span 1;
+  grid-row: 1 / 1;
+`;
+
+const NextButton = styled.button`
+  font-size: 22px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  opacity: ${props => props.disabled ? '0.5' : 'initial'};
+  transition: opacity 0.3s ease-in-out;
+  cursor: pointer;
+  grid-column: 3 / span 1;
+  grid-row: 1 / 1;
+`;
+
+const PageNumber = styled.span`
+  grid-column: 2 / span 1;
+  grid-row: 1 / 1;
+  font-size: 32px;
+  font-weight: bold;
+`;
+
+const OrderBy = styled.select`
+  grid-column: 1 / -1;
+  grid-row: 2 / -1;
+`;
+
+const FeedWrapper = styled.section `
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-row-gap: var(--spacing-medium);
+`;
+
+const FeedHeader = styled.div `
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr;
+  grid-column-gap: var(--spacing-small);
+  align-items: center;
+  h3 {
+    margin: 0;
+  }
+`;
+
+const FeedHeaderTitle = styled.div `
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+`;
+
+const FeedList = styled.ul `
+  display: grid;
+  grid-row-gap: var(--spacing-small);
+`;
 
 class Feed extends Component {
   state = {
@@ -99,35 +172,39 @@ class Feed extends Component {
     });
   }
 
-  renderTransactions = () => {
+  renderFeed = () => {
     if (this.state.transactions[this.state.page]) {
-      return this.state.transactions[this.state.page].map(transaction => (
-        <li key={transaction.id}>
-          <span>id: {transaction.id}</span>
-          <span>status: {transaction.status}</span>
-          <span>fromDate: {new Date(transaction.fromDate).toLocaleDateString()}</span>
-          <Link to={`/transaction/${transaction.id}`}>View</Link>
-        </li>
-      ))
+      return this.state.transactions[this.state.page].map((transaction,i) => (
+        <FeedItem index={i} key={transaction.id} transaction={transaction} />
+      ));
     } else {
-      return <li>No transactions</li>
+      return <li>No transactions.</li>
     }
   }
 
   render() {
     return (
       <React.Fragment>
-        <h1>Page: {this.state.page}</h1>
-        <h4>Total Pages: {this.state.totalPages}</h4>
-        <select value={this.state.orderBy} onChange={this.handleChange}>
-          <option value="">Select a vaule to sort by</option>
-          {this.createSelectItems()}
-        </select>
-        <ul>
-          {this.renderTransactions()}
-        </ul>
-        { this.state.page !== 1 ? <button onClick={this.handlePreviousClick}>Previous</button> : null }
-        { this.state.page !== this.state.totalPages ? <button onClick={this.handleNextClick}>Next</button> : null }        
+        <FeedControls>
+          <PreviousButton disabled={this.state.page === 1} onClick={this.handlePreviousClick}>Previous</PreviousButton> 
+          <PageNumber>{this.state.page}/{this.state.totalPages}</PageNumber>
+          <NextButton disabled={this.state.page === this.state.totalPages} page={this.state.page} onClick={this.handleNextClick}>Next</NextButton>
+          <OrderBy value={this.state.orderBy} onChange={this.handleChange}>
+            <option value="">Select a value to sort by</option>
+            {this.createSelectItems()}
+          </OrderBy>
+        </FeedControls>
+        <FeedWrapper>
+          <FeedHeader>
+            <FeedHeaderTitle>ID</FeedHeaderTitle>
+            <FeedHeaderTitle>Status</FeedHeaderTitle>
+            <FeedHeaderTitle>From</FeedHeaderTitle>
+            <FeedHeaderTitle>Click to view</FeedHeaderTitle>
+          </FeedHeader>
+          <FeedList>
+            {this.renderFeed()}
+          </FeedList>
+        </FeedWrapper>     
       </React.Fragment>
     )
   }

@@ -6,7 +6,7 @@ export default injectGlobal`
     /* Colors */
     --color-primary: #78C5BE;
     --color-black: #111111;
-    --color-white: #ffffff;
+    --color-white: #FFFFFF;
     /* Spacing */
     --spacing-tiny: 4px;
     --spacing-small: 8px;
