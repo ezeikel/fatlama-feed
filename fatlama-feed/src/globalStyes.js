@@ -7,6 +7,7 @@ export default injectGlobal`
     --color-primary: #78C5BE;
     --color-black: #111111;
     --color-white: #FFFFFF;
+    --color-border: #ECF0F1;
     /* Spacing */
     --spacing-tiny: 4px;
     --spacing-small: 8px;
@@ -15,6 +16,8 @@ export default injectGlobal`
     --spacing-huge: 64px;
     /* Font Sizing */
     --default-font-size: 16px;
+
+    --border-light: 1px solid var(--color-border);
   }
 
   * {
@@ -55,7 +58,7 @@ export default injectGlobal`
     border-radius: 0;
     margin-bottom: 15 px;
     padding: 1em;
-    border: 1px solid #ecf0f1;
+    border: var(--border-light);
     transition: all 0.3s ease-in-out;
     width: 100% ;
     font-weight: 300;

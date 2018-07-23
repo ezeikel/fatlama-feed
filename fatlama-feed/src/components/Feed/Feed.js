@@ -18,7 +18,7 @@ const PreviousButton = styled.button`
   background-color: var(--color-primary);
   color: var(--color-white);
   opacity: ${props => props.disabled ? '0.5' : 'initial'};
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   grid-column: 1 / span 1;
   grid-row: 1 / 1;
 `;
@@ -28,7 +28,7 @@ const NextButton = styled.button`
   background-color: var(--color-primary);
   color: var(--color-white);
   opacity: ${props => props.disabled ? '0.5' : 'initial'};
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   grid-column: 3 / span 1;
   grid-row: 1 / 1;
 `;
@@ -43,6 +43,7 @@ const PageNumber = styled.span`
 const OrderBy = styled.select`
   grid-column: 1 / -1;
   grid-row: 2 / -1;
+  text-transform: capitalize;
 `;
 
 const FeedWrapper = styled.section `
@@ -76,11 +77,13 @@ class Feed extends Component {
     page: 1,
     totalPages: 0,
     transactions: {},
-    orderBy: ''
+    orderBy: 'status'
   };
 
   componentDidMount() {
-    this.fetchData();
+    this.fetchData().then(() => {
+      this.sortFeed(this.state.orderBy);
+    });
   }
 
   fetchData = async () => {
@@ -124,17 +127,15 @@ class Feed extends Component {
     return items;
   }
 
-  handleChange = (e) => {
-    const { value } = e.target;
-
+  sortFeed = (value) => {
     this.setState(prevState => {
-      const sortByStatus = (a,b) => {
+      const sortByStatus = (a, b) => {
         if (a.status < b.status) return -1;
         if (a.status > b.status) return 1;
         return 0;
       }
 
-      const sortByDate = (a,b) => {
+      const sortByDate = (a, b) => {
         return new Date(b.fromDate) - new Date(a.fromDate);
       }
 
@@ -150,6 +151,12 @@ class Feed extends Component {
         }
       }
     });
+  }
+
+  handleChange = (e) => {
+    const { value } = e.target;
+
+    this.sortFeed(value);
   }
 
   handleNextClick = () => {
@@ -187,7 +194,6 @@ class Feed extends Component {
           <PageNumber>{this.state.page}/{this.state.totalPages}</PageNumber>
           <NextButton disabled={this.state.page === this.state.totalPages} page={this.state.page} onClick={this.handleNextClick}>Next</NextButton>
           <OrderBy value={this.state.orderBy} onChange={this.handleChange}>
-            <option value="">Select a value to sort by</option>
             {this.createSelectItems()}
           </OrderBy>
         </FeedControls>
