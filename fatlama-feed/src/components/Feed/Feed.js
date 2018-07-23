@@ -18,7 +18,6 @@ const PreviousButton = styled.button`
   background-color: var(--color-primary);
   color: var(--color-white);
   opacity: ${props => props.disabled ? '0.5' : 'initial'};
-  transition: opacity 0.3s ease-in-out;
   cursor: pointer;
   grid-column: 1 / span 1;
   grid-row: 1 / 1;
@@ -29,7 +28,6 @@ const NextButton = styled.button`
   background-color: var(--color-primary);
   color: var(--color-white);
   opacity: ${props => props.disabled ? '0.5' : 'initial'};
-  transition: opacity 0.3s ease-in-out;
   cursor: pointer;
   grid-column: 3 / span 1;
   grid-row: 1 / 1;
@@ -59,15 +57,13 @@ const FeedHeader = styled.div `
   grid-template-rows: 1fr;
   grid-column-gap: var(--spacing-small);
   align-items: center;
-  h3 {
-    margin: 0;
-  }
 `;
 
 const FeedHeaderTitle = styled.div `
   font-size: 32px;
   font-weight: bold;
   text-transform: uppercase;
+  padding: var(--spacing-small);
 `;
 
 const FeedList = styled.ul `
@@ -143,7 +139,7 @@ class Feed extends Component {
       }
 
       const transactions = [...prevState.transactions[prevState.page]];
-      
+
       transactions.sort(value === 'status' ? sortByStatus : sortByDate);
 
       return {
@@ -185,8 +181,9 @@ class Feed extends Component {
   render() {
     return (
       <React.Fragment>
+        <h1>Transaction Feed</h1>
         <FeedControls>
-          <PreviousButton disabled={this.state.page === 1} onClick={this.handlePreviousClick}>Previous</PreviousButton> 
+          <PreviousButton disabled={this.state.page === 1} onClick={this.handlePreviousClick}>Previous</PreviousButton>
           <PageNumber>{this.state.page}/{this.state.totalPages}</PageNumber>
           <NextButton disabled={this.state.page === this.state.totalPages} page={this.state.page} onClick={this.handleNextClick}>Next</NextButton>
           <OrderBy value={this.state.orderBy} onChange={this.handleChange}>
@@ -204,7 +201,7 @@ class Feed extends Component {
           <FeedList>
             {this.renderFeed()}
           </FeedList>
-        </FeedWrapper>     
+        </FeedWrapper>
       </React.Fragment>
     )
   }

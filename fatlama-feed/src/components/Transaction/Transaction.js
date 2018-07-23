@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import styled from 'styled-components';
 
 const STATUS_CODES = [
   'ESCROW',
@@ -11,6 +12,176 @@ const STATUS_CODES = [
 ];
 
 const URL = 'http://localhost:8080';
+
+const TransactionInfoWrapper = styled.div`
+  display: grid;
+  grid-template-rows: auto 1fr;
+`;
+
+const TransactionHeading = styled.section`
+  grid-column: 1 / -1;
+  grid-row: 1 / 1;
+  font-size: 32px;
+  font-weight: bold;
+`;
+
+const RentalInfoData = styled.section`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+`;
+
+const RentalStatusTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 1 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const RentalStartDateTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 2 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const RentalEndDateTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 3 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const TransactionInfoValue = styled.div`
+  padding: var(--spacing-medium);
+  border: 1px solid #ecf0f1;
+  display: grid;
+  align-items: center;
+`;
+
+const TransactionInfoImageValue = styled.div`
+  padding: var(--spacing-medium);
+  border: 1px solid #ecf0f1;
+  display: grid;
+  place-items: center;
+  img {
+    max-height: 50px;
+  }
+`;
+
+const PaymentInfo = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+`;
+
+const PromoCodeTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 1 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const CreditUsedTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 2 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const TotalDiscountTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 3 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const TotalPriceTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 4 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserInfo = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+`;
+
+const UserIdTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 1 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserProfileImageTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 2 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserFirstNameTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 3 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserLastNameTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 4 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserTelephoneTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 5 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserCreditTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 6 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
+
+const UserEmailTitle = styled.div`
+  grid-row: 1 / 2;
+  grid-column: 7 / span 1;
+  text-transform: uppercase;
+  padding: var(--spacing-medium);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+`;
 
 class Transaction extends Component {
   state = {
@@ -64,10 +235,10 @@ class Transaction extends Component {
       status: this.state.updatedStatus
     })
     .then(response => {
-      console.log(`Updated Transactions successfully ✅`);
       const { status, data } = response;
 
       if (status === 200) {
+        console.log(`Updated Transaction({${response.id}}) successfully ✅`);
         this.setState({
           transaction: data,
           updatedStatus: ''
@@ -80,16 +251,26 @@ class Transaction extends Component {
     });
   }
 
-  renderUser = (user) => {
-    if (user) {
+  renderUser = (id, user) => {
+    if (id && user) {
       return (
         <React.Fragment>
-          <img src={user.profileImgUrl} alt="profile" />
-          <span><strong>Firstname:</strong> {user.firstName}</span>
-          <span><strong>LastName:</strong> {user.lastName}</span>
-          <span><strong>Telephone:</strong> {user.telephone}</span>
-          <span><strong>Credit:</strong> {user.credit}</span>
-          <span><strong>Email:</strong> {user.email}</span>
+          <UserIdTitle>ID</UserIdTitle>
+          <UserProfileImageTitle>Avatar</UserProfileImageTitle>
+          <UserFirstNameTitle>Firstname</UserFirstNameTitle>
+          <UserLastNameTitle>Lastname</UserLastNameTitle>
+          <UserTelephoneTitle>Telephone</UserTelephoneTitle>
+          <UserCreditTitle>Credit</UserCreditTitle>
+          <UserEmailTitle>Email</UserEmailTitle>
+          <TransactionInfoValue>{id}</TransactionInfoValue>
+          <TransactionInfoImageValue>
+            <img src={user.profileImgUrl} alt="profile" />
+          </TransactionInfoImageValue>
+          <TransactionInfoValue>{user.firstName}</TransactionInfoValue>
+          <TransactionInfoValue>{user.lastName}</TransactionInfoValue>
+          <TransactionInfoValue>{user.telephone}</TransactionInfoValue>
+          <TransactionInfoValue>{Number(user.credit / 100).toFixed(2)} <span>({this.state.transaction.currency})</span></TransactionInfoValue>
+          <TransactionInfoValue>{user.email}</TransactionInfoValue>
         </React.Fragment>
       );
     }
@@ -99,19 +280,43 @@ class Transaction extends Component {
     const { transaction, borrower, lender } =  this.state;
     return (
       <React.Fragment>
-        <h1><strong>ID:</strong> {transaction.id}</h1>
-        <h3><strong>Status:</strong> {transaction.status}</h3>
-        <span><strong>From:</strong> {new Date(transaction.fromDate).toLocaleDateString()}</span>
-        <span><strong>To:</strong> {new Date(transaction.toDate).toLocaleDateString()}</span>
-        <span><strong>Promo Code:</strong> {transaction.promocode === null ? 'No promo code used.' : transaction.promocode}</span>
-        <span><strong>Credit Used:</strong> {Number(transaction.creditUsed / 100).toFixed(2)} <span>({transaction.currency})</span></span>
-        <span><strong>Total Discount:</strong> {Number(transaction.totalDiscount / 100).toFixed(2)} <span>({transaction.currency})</span></span>
-        <span><strong>Price:</strong> {Number(transaction.price / 100).toFixed(2)} <span>({transaction.currency})</span></span>
-        <h2>Lender</h2>
-        {this.renderUser(lender)}
-        <span>{transaction.lenderId}</span>
-        <h2>Borrower</h2>
-        {this.renderUser(borrower)}
+        <h1>Transaction ({transaction.id})</h1>
+        <TransactionInfoWrapper>
+          <TransactionHeading>Rental</TransactionHeading>
+          <RentalInfoData>
+            <RentalStatusTitle>Status</RentalStatusTitle>
+            <RentalStartDateTitle>Start date</RentalStartDateTitle>
+            <RentalEndDateTitle>End date</RentalEndDateTitle>
+            <TransactionInfoValue>{transaction.status}</TransactionInfoValue>
+            <TransactionInfoValue>{new Date(transaction.fromDate).toLocaleDateString()}</TransactionInfoValue>
+            <TransactionInfoValue>{new Date(transaction.toDate).toLocaleDateString()}</TransactionInfoValue>
+          </RentalInfoData>
+        </TransactionInfoWrapper>
+        <TransactionInfoWrapper>
+          <TransactionHeading>Payment</TransactionHeading>
+          <PaymentInfo>
+            <PromoCodeTitle>Promo code</PromoCodeTitle>
+            <CreditUsedTitle>Credit used</CreditUsedTitle>
+            <TotalDiscountTitle>Total discount</TotalDiscountTitle>
+            <TotalPriceTitle>Total price</TotalPriceTitle>
+            <TransactionInfoValue>{transaction.promocode === null ? 'None.' : transaction.promocode}</TransactionInfoValue>
+            <TransactionInfoValue>{Number(transaction.creditUsed / 100).toFixed(2)} <span>({transaction.currency})</span></TransactionInfoValue>
+            <TransactionInfoValue>{Number(transaction.totalDiscount / 100).toFixed(2)} <span>({transaction.currency})</span></TransactionInfoValue>
+            <TransactionInfoValue>{Number(transaction.price / 100).toFixed(2)} <span>({transaction.currency})</span></TransactionInfoValue>
+          </PaymentInfo>
+        </TransactionInfoWrapper>
+        <TransactionInfoWrapper>
+          <TransactionHeading>Lender</TransactionHeading>
+          <UserInfo>
+            {this.renderUser(transaction.lenderId, lender)}
+          </UserInfo>
+        </TransactionInfoWrapper>
+        <TransactionInfoWrapper>
+          <TransactionHeading>Borrower</TransactionHeading>
+          <UserInfo>
+            {this.renderUser(transaction.borrowerId, borrower)}
+          </UserInfo>
+        </TransactionInfoWrapper>
         <h2>Change Status</h2>
         <form onSubmit={this.handleSubmit}>
           <select value={this.state.updatedStatus} onChange={this.handleChange}>
