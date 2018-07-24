@@ -8,7 +8,8 @@ const STATUS_CODES = [
   'PAID',
   'PRE_AUTHORIZED',
   'PRE_AUTHORIZED_CANCELLED',
-  'QUARANTINED'
+  'QUARANTINED',
+  'CANCELLED'
 ];
 
 const URL = 'http://localhost:8080';
@@ -32,11 +33,15 @@ const PageTitle = styled.h1`
 `;
 
 const UpdateStatus = styled.form`
-  grid-column: 1 / span 2;
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: auto auto
+  grid-template-columns: repeat(4, 1fr);
   grid-column-gap: var(--spacing-medium);
+  select {
+    grid-column: 1 / span 1;
+  }
   input[type="submit"] {
+    grid-column: 2 / span 1;
     border: 1px solid var(--color-primary);
     color: var(--color-primary);
     font-weight: bold;
@@ -50,6 +55,15 @@ const UpdateStatus = styled.form`
     opacity: 0.5;
     cursor: not-allowed;
   }
+`;
+
+const FormMessage = styled.span`
+  grid-column: 3 / -1;
+  display: grid;
+  place-items: center;
+  background-color: green;
+  color: var(--color-white);
+  opacity: ${props => props.submitted ? 1 : 0};
 `;
 
 const TransactionInfoWrapper = styled.div`
@@ -227,7 +241,8 @@ class Transaction extends Component {
     transaction: {},
     lender: {},
     borrower: {},
-    updatedStatus: ''
+    updatedStatus: '',
+    submitted: false
   }
 
   componentDidMount() {
@@ -280,7 +295,8 @@ class Transaction extends Component {
         console.log(`Updated Transaction({${response.id}}) successfully ✅`);
         this.setState({
           transaction: data,
-          updatedStatus: data.status
+          updatedStatus: data.status,
+          submitted: true
         });
       }
 
@@ -316,18 +332,19 @@ class Transaction extends Component {
   }
 
   render() {
-    const { transaction, borrower, lender, updatedStatus } =  this.state;
+    const { transaction, borrower, lender, updatedStatus, submitted } =  this.state;
     debugger;
     return (
       <React.Fragment>
         <TransactionHeader>
           <PageTitle>Transaction ({transaction.id})</PageTitle>
-          <h2>Update Transaction Status</h2>
+          <h2>Update Status</h2>
           <UpdateStatus onSubmit={this.handleSubmit}>
             <select value={updatedStatus} onChange={this.handleChange}>
               {this.createSelectItems(transaction.status)}
             </select>
             <input disabled={transaction.status === updatedStatus} type="submit" value="Submit" />
+            <FormMessage submitted={submitted}>Updated status to: {updatedStatus}</FormMessage>
           </UpdateStatus>
         </TransactionHeader>
         <TransactionInfoWrapper>
