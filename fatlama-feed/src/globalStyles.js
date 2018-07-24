@@ -1,4 +1,4 @@
-import { injectGlobal } from 'styled-components';
+import { injectGlobal, keyframes } from 'styled-components';
 
 export default injectGlobal`
   /* CSS Variables */
@@ -76,5 +76,20 @@ export default injectGlobal`
   }
   input, button, submit {
     border: none;
+  }
+`;
+
+export const flashKeyframe = keyframes`
+  0% {
+    opacity: 0;
+    //transform: translateX(100vw);
+  }
+  50% {
+    opacity: 1;
+    //transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    //transform: translateX(100vw);
   }
 `;

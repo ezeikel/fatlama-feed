@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
+import Spinner from '../../containers/Spinner/Spinner';
 import FeedItem from '../../containers/FeedItem/FeedItem';
 
 const FeedControls = styled.section`
@@ -57,7 +58,7 @@ const FeedHeader = styled.div `
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 1fr;
   grid-column-gap: var(--spacing-small);
-  align-items: center;
+  place-items: center;
 `;
 
 const FeedHeaderTitle = styled.div `
@@ -77,12 +78,16 @@ class Feed extends Component {
     page: 1,
     totalPages: 0,
     transactions: {},
-    orderBy: 'status'
+    orderBy: 'status',
+    loading: true
   };
 
   componentDidMount() {
     this.fetchData().then(() => {
       this.sortFeed(this.state.orderBy);
+      this.setState({
+        loading: false
+      });
     });
   }
 
@@ -176,8 +181,9 @@ class Feed extends Component {
   }
 
   renderFeed = () => {
-    if (this.state.transactions[this.state.page]) {
-      return this.state.transactions[this.state.page].map((transaction,i) => (
+    const { page, transactions } =  this.state;
+    if (transactions[page]) {
+      return transactions[page].map((transaction,i) => (
         <FeedItem index={i} key={transaction.id} transaction={transaction} />
       ));
     } else {
@@ -186,14 +192,20 @@ class Feed extends Component {
   }
 
   render() {
+    const { page, totalPages, orderBy, loading } =  this.state;
+
+    if (loading) {
+      return <Spinner />
+    }
+
     return (
       <React.Fragment>
         <h1>Transaction Feed</h1>
         <FeedControls>
-          <PreviousButton disabled={this.state.page === 1} onClick={this.handlePreviousClick}>Previous</PreviousButton>
-          <PageNumber>{this.state.page}/{this.state.totalPages}</PageNumber>
-          <NextButton disabled={this.state.page === this.state.totalPages} page={this.state.page} onClick={this.handleNextClick}>Next</NextButton>
-          <OrderBy value={this.state.orderBy} onChange={this.handleChange}>
+          <PreviousButton disabled={page === 1} onClick={this.handlePreviousClick}>Previous</PreviousButton>
+          <PageNumber>{page}/{totalPages}</PageNumber>
+          <NextButton disabled={page === totalPages} page={page} onClick={this.handleNextClick}>Next</NextButton>
+          <OrderBy value={orderBy} onChange={this.handleChange}>
             {this.createSelectItems()}
           </OrderBy>
         </FeedControls>
@@ -202,7 +214,6 @@ class Feed extends Component {
             <FeedHeaderTitle>ID</FeedHeaderTitle>
             <FeedHeaderTitle>Status</FeedHeaderTitle>
             <FeedHeaderTitle>From</FeedHeaderTitle>
-            <FeedHeaderTitle>Click to view</FeedHeaderTitle>
           </FeedHeader>
           <FeedList>
             {this.renderFeed()}

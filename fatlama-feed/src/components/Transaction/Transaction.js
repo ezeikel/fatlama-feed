@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
+import { flashKeyframe } from '../../globalStyles';
+import Spinner from '../../containers/Spinner/Spinner';
+
 const STATUS_CODES = [
   'ESCROW',
   'FL_APPROVED',
@@ -33,6 +36,7 @@ const PageTitle = styled.h1`
 `;
 
 const UpdateStatus = styled.form`
+  overflow-x: hidden;
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -63,7 +67,8 @@ const FormMessage = styled.span`
   place-items: center;
   background-color: green;
   color: var(--color-white);
-  opacity: ${props => props.submitted ? 1 : 0};
+  opacity: 0
+  animation: ${props => props.submitted ? flashKeyframe : 'none'} 3s ease-in-out;
 `;
 
 const TransactionInfoWrapper = styled.div`
@@ -242,7 +247,8 @@ class Transaction extends Component {
     lender: {},
     borrower: {},
     updatedStatus: '',
-    submitted: false
+    submitted: false,
+    loading: true
   }
 
   componentDidMount() {
@@ -260,7 +266,8 @@ class Transaction extends Component {
       transaction: transaction.data,
       lender: lender.data,
       borrower: borrower.data,
-      updatedStatus: transaction.data.status
+      updatedStatus: transaction.data.status,
+      loading: false
     });
   }
 
@@ -298,6 +305,13 @@ class Transaction extends Component {
           updatedStatus: data.status,
           submitted: true
         });
+
+        setTimeout(() => {
+          console.log('Yo!');
+          this.setState({
+            submitted: false
+          });
+        }, 3000)
       }
 
     })
@@ -332,8 +346,11 @@ class Transaction extends Component {
   }
 
   render() {
-    const { transaction, borrower, lender, updatedStatus, submitted } =  this.state;
-    debugger;
+    const { transaction, borrower, lender, updatedStatus, submitted, loading } =  this.state;
+    if (loading) {
+      return <Spinner />
+    }
+
     return (
       <React.Fragment>
         <TransactionHeader>
@@ -344,7 +361,7 @@ class Transaction extends Component {
               {this.createSelectItems(transaction.status)}
             </select>
             <input disabled={transaction.status === updatedStatus} type="submit" value="Submit" />
-            <FormMessage submitted={submitted}>Updated status to: {updatedStatus}</FormMessage>
+            <FormMessage submitted={submitted}>Updated status.</FormMessage>
           </UpdateStatus>
         </TransactionHeader>
         <TransactionInfoWrapper>

@@ -6,12 +6,22 @@ const Wrapper = styled.li`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-column-gap: var(--spacing-small);
-  align-items: center;
+  place-items: center;
   padding: var(--spacing-small);
   background-color: ${props => props.index % 2 !== 0 ? 'var(--color-primary)' : 'var(--color-white)' };
   color: ${props => props.index % 2 !== 0 ? 'var(--color-white)' : 'var(--color-black)' };
   a {
+    position: relative;
     color: ${props => props.index % 2 !== 0 ? 'var(--color-white)' : 'var(--color-black)' };
+  }
+  a:after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: ${props => props.index % 2 !== 0 ? 'var(--color-white)' : 'var(--color-primary)'};
   }
 `;
 
