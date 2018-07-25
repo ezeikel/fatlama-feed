@@ -46,12 +46,7 @@ export default injectGlobal`
     text-decoration: none;
   }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="date"],
   input[type="submit"],
-  textarea,
   select {
     appearance: none;
     -webkit-appearance: none;
@@ -68,7 +63,6 @@ export default injectGlobal`
   }
 
   input,
-  textarea,
   select,
   label {
     font-size: var(--default-font-size);
@@ -85,14 +79,11 @@ export default injectGlobal`
 export const flashKeyframe = keyframes`
   0% {
     opacity: 0;
-    //transform: translateX(100vw);
   }
   50% {
     opacity: 1;
-    //transform: translateX(0);
   }
   100% {
     opacity: 0;
-    //transform: translateX(100vw);
   }
 `;
