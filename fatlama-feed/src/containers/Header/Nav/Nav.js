@@ -15,6 +15,7 @@ const NavBar = styled.nav `
 
 const Logo = styled.img `
   max-height: 100%;
+  transform: scaleX(-1);
 `;
 
 const Nav = () => (
