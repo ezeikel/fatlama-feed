@@ -17,6 +17,16 @@ const STATUS_CODES = [
 
 const URL = 'http://localhost:8080';
 
+const Error = styled.div`
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  place-items: center;
+  background-color: var(--color-red);
+  color: var(--color-white);
+`
+
 const TransactionHeader = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -65,7 +75,7 @@ const FormMessage = styled.span`
   grid-column: 3 / -1;
   display: grid;
   place-items: center;
-  background-color: green;
+  background-color: ${props => props.error ? 'var(--color-red)' : 'var(--color-green)'};
   color: var(--color-white);
   opacity: 0
   animation: ${props => props.submitted ? flashKeyframe : 'none'} 3s ease-in-out;
@@ -248,7 +258,12 @@ class Transaction extends Component {
     borrower: {},
     updatedStatus: '',
     submitted: false,
-    loading: true
+    loading: true,
+    error: {
+      active: false,
+      message: '',
+      type: ''
+    }
   }
 
   componentDidMount() {
@@ -258,9 +273,23 @@ class Transaction extends Component {
   }
 
   fetchData = async (id) => {
-    const transaction = await axios.get(`${URL}/transaction/${id}`);
-    const lender = await axios.get(`${URL}/user/${transaction.data.lenderId}`);
-    const borrower = await axios.get(`${URL}/user/${transaction.data.borrowerId}`);
+    let transaction, lender, borrower;
+
+    try {
+      transaction = await axios.get(`${URL}/transaction/${id}`);
+      [lender, borrower] = await Promise.all([axios.get(`${URL}/user/${transaction.data.lenderId}`), axios.get(`${URL}/user/${transaction.data.borrowerId}`)]);
+    } catch(e) {
+      console.log(`There was an error: ${e}`);
+      this.setState({
+        loading: false,
+        error: {
+          active: true,
+          message: 'Oops, there was an error fetching data. please refresh the page.',
+          type: 'fetch'
+        }
+      });
+      return;
+    }
 
     this.setState({
       transaction: transaction.data,
@@ -299,15 +328,15 @@ class Transaction extends Component {
       const { status, data } = response;
 
       if (status === 200) {
-        console.log(`Updated Transaction({${response.id}}) successfully ✅`);
+        console.log(`Updated Transaction(${data.id}) successfully ✅`);
         this.setState({
           transaction: data,
           updatedStatus: data.status,
           submitted: true
         });
 
+        //TODO: Find a better way to do this
         setTimeout(() => {
-          console.log('Yo!');
           this.setState({
             submitted: false
           });
@@ -316,7 +345,22 @@ class Transaction extends Component {
 
     })
     .catch(error => {
-      console.log(`Failed to update transaction with error: ${error}.`);
+      console.log(`Failed to update transaction with error: ${error}. ⛔️`);
+      this.setState({
+        submitted: true,
+        error: {
+          active: true,
+          message: 'Oops there was an error updating status. Please try again.',
+          type: 'submit'
+        }
+      });
+
+      //TODO: Find a better way to do this
+      setTimeout(() => {
+        this.setState({
+          submitted: false
+        });
+      }, 3000)
     });
   }
 
@@ -346,9 +390,14 @@ class Transaction extends Component {
   }
 
   render() {
-    const { transaction, borrower, lender, updatedStatus, submitted, loading } =  this.state;
+    const { transaction, borrower, lender, updatedStatus, submitted, loading, error } =  this.state;
+
     if (loading) {
       return <Spinner />
+    }
+
+    if (error.active && error.type === 'fetch') {
+      return <Error><h1>{error.message}</h1></Error>
     }
 
     return (
@@ -361,7 +410,7 @@ class Transaction extends Component {
               {this.createSelectItems(transaction.status)}
             </select>
             <input disabled={transaction.status === updatedStatus} type="submit" value="Submit" />
-            <FormMessage submitted={submitted}>Updated status.</FormMessage>
+            <FormMessage submitted={submitted} error={error.active && error.type === 'submit'}>{error.active && error.type === 'submit' ? error.message : 'Updated status.'}</FormMessage>
           </UpdateStatus>
         </TransactionHeader>
         <TransactionInfoWrapper>
