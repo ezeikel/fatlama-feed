@@ -144,6 +144,7 @@ class Feed extends Component {
         return new Date(b.fromDate) - new Date(a.fromDate);
       }
 
+      debugger;
       const transactions = [...prevState.transactions[prevState.page]];
 
       transactions.sort(value === 'status' ? sortByStatus : sortByDate);
