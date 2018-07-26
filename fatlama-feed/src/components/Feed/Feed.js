@@ -3,49 +3,10 @@ import axios from 'axios';
 import styled from 'styled-components';
 
 import Spinner from '../../containers/Spinner/Spinner';
+import FeedHeader from '../../containers/FeedHeader/FeedHeader';
+import FeedList from '../../containers/FeedList/FeedList';
 import FeedItem from '../../containers/FeedItem/FeedItem';
-
-const FeedControls = styled.section`
-  width: 25%;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  grid-template-rows: 1fr 1fr;
-  place-items: center;
-  grid-column-gap: var(--spacing-medium);
-`;
-
-const PreviousButton = styled.button`
-  font-size: 22px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  opacity: ${props => props.disabled ? '0.5' : 'initial'};
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  grid-column: 1 / span 1;
-  grid-row: 1 / 1;
-`;
-
-const NextButton = styled.button`
-  font-size: 22px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  opacity: ${props => props.disabled ? '0.5' : 'initial'};
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  grid-column: 3 / span 1;
-  grid-row: 1 / 1;
-`;
-
-const PageNumber = styled.span`
-  grid-column: 2 / span 1;
-  grid-row: 1 / 1;
-  font-size: 32px;
-  font-weight: bold;
-`;
-
-const OrderBy = styled.select`
-  grid-column: 1 / -1;
-  grid-row: 2 / -1;
-  text-transform: capitalize;
-`;
+import PaginationControls from '../../containers/PaginationControls/PaginationControls';
 
 const FeedWrapper = styled.section `
   display: grid;
@@ -53,25 +14,16 @@ const FeedWrapper = styled.section `
   grid-row-gap: var(--spacing-medium);
 `;
 
-const FeedHeader = styled.div `
+const Error = styled.div `
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: 1fr;
-  grid-column-gap: var(--spacing-small);
   place-items: center;
+  background-color: var(--color-red);
+  color: var(--color-white);
 `;
 
-const FeedHeaderTitle = styled.div `
-  font-size: 32px;
-  font-weight: bold;
-  text-transform: uppercase;
-  padding: var(--spacing-small);
-`;
-
-const FeedList = styled.ul `
-  display: grid;
-  grid-row-gap: var(--spacing-small);
-`;
 
 class Feed extends Component {
   state = {
@@ -134,7 +86,8 @@ class Feed extends Component {
 
   sortFeed = (value) => {
     this.setState(prevState => {
-      if (!prevState) return;
+      // no transactions
+      if (prevState.totalPages === 0) return;
 
       const sortByStatus = (a, b) => {
         if (a.status < b.status) return -1;
@@ -145,6 +98,8 @@ class Feed extends Component {
       const sortByDate = (a, b) => {
         return new Date(b.fromDate) - new Date(a.fromDate);
       }
+
+      console.log({ prevState });
 
       const transactions = [...prevState.transactions[prevState.page]];
 
@@ -200,26 +155,17 @@ class Feed extends Component {
       return <Spinner />
     }
 
+    if (totalPages === 0) {
+      return <Error><h1>Unabled to fetch Transactions. Please refresh page.</h1></Error>;
+    }
+
     return (
       <React.Fragment>
         <h1>Transaction Feed</h1>
-        <FeedControls>
-          <PreviousButton disabled={page === 1} onClick={this.handlePreviousClick}>Previous</PreviousButton>
-          <PageNumber>{page}/{totalPages}</PageNumber>
-          <NextButton disabled={page === totalPages} page={page} onClick={this.handleNextClick}>Next</NextButton>
-          <OrderBy value={orderBy} onChange={this.handleChange}>
-            {this.createSelectItems()}
-          </OrderBy>
-        </FeedControls>
+        <PaginationControls previous={this.handlePreviousClick} next={this.handleNextClick} changeOrder={this.handleChange} page={page} totalPages={totalPages} createSelectItems={this.createSelectItems} orderBy={orderBy} />
         <FeedWrapper>
-          <FeedHeader>
-            <FeedHeaderTitle>ID</FeedHeaderTitle>
-            <FeedHeaderTitle>Status</FeedHeaderTitle>
-            <FeedHeaderTitle>From</FeedHeaderTitle>
-          </FeedHeader>
-          <FeedList>
-            {this.renderFeed()}
-          </FeedList>
+          <FeedHeader />
+          <FeedList render={this.renderFeed} />
         </FeedWrapper>
       </React.Fragment>
     )
