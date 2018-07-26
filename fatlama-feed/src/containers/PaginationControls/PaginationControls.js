@@ -2,12 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 const ControlsWrapper = styled.section `
-  width: 25%;
+  width: 300px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr auto 1fr;
   place-items: center;
-  grid-column-gap: var(--spacing-medium);
+  grid-gap: var(--spacing-large);
+
 `;
 
 const PreviousButton = styled.button `
@@ -18,6 +19,8 @@ const PreviousButton = styled.button `
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   grid-column: 1 / span 1;
   grid-row: 1 / 1;
+  height: 100%;
+  width: 100%;
 `;
 
 const NextButton = styled.button `
@@ -28,6 +31,8 @@ const NextButton = styled.button `
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   grid-column: 3 / span 1;
   grid-row: 1 / 1;
+  height: 100%;
+  width: 100%;
 `;
 
 const PageNumber = styled.span `
@@ -37,9 +42,16 @@ const PageNumber = styled.span `
   font-weight: bold;
 `;
 
+const Title = styled.h3 `
+  width: 100%;
+  margin: 0;
+  grid-column: 1 / -1;
+  grid-row: 2 / span 1;
+`;
+
 const OrderBy = styled.select `
   grid-column: 1 / -1;
-  grid-row: 2 / -1;
+  grid-row: 3 / span 1;
   text-transform: capitalize;
 `;
 
@@ -48,6 +60,7 @@ const PaginationControls = ({page, orderBy, totalPages, previous, next, createSe
     <PreviousButton disabled={page === 1} onClick={previous}>Previous</PreviousButton>
     <PageNumber>{page}/{totalPages}</PageNumber>
     <NextButton disabled={page === totalPages} page={page} onClick={next}>Next</NextButton>
+    <Title>Order By:</Title>
     <OrderBy value={orderBy} onChange={changeOrder}>
       {createSelectItems()}
     </OrderBy>

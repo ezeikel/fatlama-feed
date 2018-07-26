@@ -87,7 +87,10 @@ class Feed extends Component {
   sortFeed = (value) => {
     this.setState(prevState => {
       // no transactions
-      if (prevState.totalPages === 0) return;
+      if (prevState.totalPages === 0) {
+        // go get some data!
+        return this.fetchData();
+      }
 
       const sortByStatus = (a, b) => {
         if (a.status < b.status) return -1;

@@ -53,6 +53,10 @@ class Transaction extends Component {
     this.fetchData(params.id);
   }
 
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
+  }
+
   fetchData = async (id) => {
     let transaction, lender, borrower;
 
@@ -99,6 +103,18 @@ class Transaction extends Component {
     });
   }
 
+  resetSubmittedStatus = () => {
+  if (this.timeout) {
+    clearTimeout(this.timeout);
+  }
+
+  this.timeout = setTimeout(() => {
+    this.setState({
+      submitted: false
+    });
+  }, 3000);
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
 
@@ -116,12 +132,7 @@ class Transaction extends Component {
           submitted: true
         });
 
-        //TODO: Find a better way to do this
-        setTimeout(() => {
-          this.setState({
-            submitted: false
-          });
-        }, 3000)
+        this.resetSubmittedStatus();
       }
 
     })
@@ -136,12 +147,7 @@ class Transaction extends Component {
         }
       });
 
-      //TODO: Find a better way to do this
-      setTimeout(() => {
-        this.setState({
-          submitted: false
-        });
-      }, 3000)
+      this.resetSubmittedStatus();
     });
   }
 

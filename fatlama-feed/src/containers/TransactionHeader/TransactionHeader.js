@@ -60,7 +60,7 @@ const FormMessage = styled.span `
 const TransactionHeader = ({ transaction, submitted, error, handleSubmit, handleChange, createSelectItems, updatedStatus}) => (
 <Header>
   <PageTitle>Transaction ({transaction.id})</PageTitle>
-  <h2>Update Status</h2>
+  <h3>Update Status:</h3>
   <UpdateStatus onSubmit={handleSubmit}>
     <select value={updatedStatus} onChange={handleChange}>
       {createSelectItems(transaction.status)}
