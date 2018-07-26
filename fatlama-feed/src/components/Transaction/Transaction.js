@@ -30,7 +30,7 @@ const Error = styled.div`
   place-items: center;
   background-color: var(--color-red);
   color: var(--color-white);
-`
+`;
 
 class Transaction extends Component {
   state = {
