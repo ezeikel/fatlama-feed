@@ -3,8 +3,8 @@
 ## Technologies Used:
 - `create-react-app`
 - `react-router-dom`
-- `axios
-- styled-component`s
+- `axios`
+- `styled-components`
 - `CSS Grid` + `Custom Properties`
 
 ## Why
